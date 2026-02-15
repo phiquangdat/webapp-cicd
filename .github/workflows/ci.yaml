@@ -30,7 +30,7 @@ jobs:
       - name: Run tests
         run: |
           cd app
-          pytest app.test.py -v
+          pytest test_app.py -v
 
       - name: Azure Login
         uses: azure/login@v1
