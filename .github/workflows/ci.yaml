@@ -1,16 +1,12 @@
-name: CI - Build and Push
+name: CI - Build and Test
 
 on:
   push:
     branches:
       - main
 
-env:
-  IMAGE_NAME: webapp
-
 jobs:
   build-and-test:
-    name: Build, Test, and Push Docker Image
     runs-on: ubuntu-latest
 
     steps:
@@ -31,25 +27,3 @@ jobs:
         run: |
           cd app
           pytest test_app.py -v
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to ACR
-        run: |
-          az acr login --name ${{ secrets.ACR_NAME }}
-
-      - name: Build Docker image
-        run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG .
-          docker tag ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG \
-                     ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Push to ACR
-        run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:$IMAGE_TAG
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
